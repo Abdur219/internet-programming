@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Advanced Website Example</title>
+</head>
+>
+	<h1>User Posts</h1>
+	<input type="text"="search-input" placeholder="Search users...">
+	<ul id="user-list"></ul>
+	<div id="post-container"></div>
+
+	<script>
+// Define the API endpoint for fetching users
+const usersEndpoint = 'https://jsonplaceholder.typicode.com/users';
+
+// Define the API endpoint for fetching posts
+const postsEndpoint = 'https://jsonplaceholder.typicode.com/posts';
+
+// Define the DOM elements where we will display the data
+const userListElement = document.getElementById('user-list');
+const postContainerElement = document.getElementById('post-container');
+const searchInputElement = document.getElementById('search-input');
+
+// Define a function that will fetch users from the API and display them in the user list
+async function fetchUsersAndDisplay() {
+  // Fetch users from the API
+  const response = await fetch(usersEndpoint);
+  
+  // Convert the response to JSON
+  const users = await response.json();
+
+  // Clear any existing content in the user list
+  userListElement.innerHTML = '';
+
+  // Loop through the users and create a new list item for each one
+  users.forEach(user => {
+    const li = document.createElement('li');
+    li.textContent = user.name;
+    li.dataset.userId = user.id; // Store the user ID on the list item as a data attribute
+    li.addEventListener('click', fetchPostsForUser); // Add a click event listener to fetch posts for the user
+    userListElement.appendChild(li);
+  });
+}
+
+// Define a function that will fetch posts for a user and display them in the post container
+async function fetchPostsForUser(event) {
+  // Get the user ID from the clicked list item
+  const userId = event.target.dataset.userId;
+
+  // Fetch posts for the user from the API
+  const response = await fetch(`${postsEndpoint}?userId=${userId}`);
+  
+  // Convert the response to JSON
+  const posts = await response.json();
+
+  // Clear any existing content in the post container
+  postContainerElement.innerHTML = '';
+
+  // Loop through the posts and create a new DOM element for each one
+  posts.forEach(post => {
+    const div = document.createElement('div');
+    div.textContent = post.title;
+    postContainerElement.appendChild(div);
+  });
+}
+
+// Define a function that will filter the user list based on the search input
+function filterUserList() {
+  // Get the search input value
+  const searchInputValue = searchInputElement.value.toLowerCase();
+
+  // Loop through the list items and show or hide them based on the search input value
+  Array.from(userListElement.children).forEach(li => {
+    if (li.textContent.toLowerCase().includes(searchInputValue)) {
+      li.style.display = 'list-item';
+    } else {
+      li.style.display = 'none';
+    }
+  });
+}
+
+// Call the function to fetch users and display them in the user list
+fetchUsersAndDisplay();
+
+// Add an input event listener to the search input to filter the user list
+searchInputElement.addEventListener('input', filterUserList);
+	</script>
+</body>
+</html>
